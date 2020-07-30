@@ -7,7 +7,7 @@ const initialState = {
   videos: []
 }
 
-function videoReducer(state = initialState, action) {
+export default function videoReducer(state = initialState, action) {
   switch (action.type) {
     case ActionTypes.GET_ALL_VIDEOS_REQUEST:
       return {
@@ -30,7 +30,3 @@ function videoReducer(state = initialState, action) {
       return state;
   }
 }
-
-export default combineReducers({
-  videos: videoReducer
-});

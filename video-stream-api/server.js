@@ -6,9 +6,9 @@ const fs = require('fs');
 const fileType = require('file-type');
 const multiparty = require('multiparty');
 const bodyParser = require('body-parser');
-const { databaseConfig } = require('./config');
-require('dotenv').config();
 
+require('dotenv').config();
+const { databaseConfig } = require('./config');
 const uploadService = require('./services/uploadService');
 
 app.use(cors());
