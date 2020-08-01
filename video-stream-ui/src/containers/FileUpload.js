@@ -15,7 +15,7 @@ const FileUpload = ({ uploadNewVideo, onCloseModal }) => {
 
     const submitFile = useCallback((event) => {
         event.preventDefault();
-        if (password?.length && file) {
+        if (password?.length > 0 && file) {
             uploadNewVideo(file, password);
             setFile(null);
             setDisplayPasswordRequiredError(false);
@@ -31,6 +31,10 @@ const FileUpload = ({ uploadNewVideo, onCloseModal }) => {
 
     const handleFileUpload = useCallback((event) => {
         setFile(event.target.files);
+    }, []);
+
+    const handlePasswordChange = useCallback((event) => {
+        setPassword(event.target.value);
     }, []);
 
     return (
@@ -51,7 +55,7 @@ const FileUpload = ({ uploadNewVideo, onCloseModal }) => {
             </Form.Group>
             <Form.Group>
                 <Form.Label>Password</Form.Label>
-                <Form.Control type="password" onChange={setPassword} />
+                <Form.Control type="password" onChange={handlePasswordChange} />
                 {displayPasswordRequiredError ? (
                     <Form.Text className="text-danger">
                         Password is required

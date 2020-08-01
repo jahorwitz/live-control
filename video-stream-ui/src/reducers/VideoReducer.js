@@ -3,7 +3,9 @@ import * as ActionTypes from '../shared/actionTypes'
 
 const initialState = {
   isFetching: false,
-  error: null,
+  isUploading: false,
+  fetchError: null,
+  uploadError: null,
   videos: []
 }
 
@@ -24,7 +26,24 @@ export default function videoReducer(state = initialState, action) {
       return {
         ...state,
         isFetching: false,
-        error: action.error
+        fetchError: action.error
+      }
+    case ActionTypes.UPLOAD_VIDEO_REQUEST:
+      return {
+        ...state,
+        isUploading: true
+      }
+    case ActionTypes.UPLOAD_VIDEO_SUCCESS:
+      return {
+        ...state,
+        isUploading: false,
+        videos: action.videos
+      }
+    case ActionTypes.UPLOAD_VIDEO_ERROR:
+      return {
+        ...state,
+        isUploading: false,
+        uploadError: action.error
       }
     default:
       return state;

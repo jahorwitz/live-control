@@ -21,8 +21,8 @@ export const uploadNewVideo = (file, password) => async (dispatch) => {
             'Content-Type': 'multipart/form-data'
         }
     }).then(response => {
-        // handle your response;
+        dispatch({type: ActionTypes.UPLOAD_VIDEO_SUCCESS, videos: response.data.videos});
     }).catch(error => {
-        // handle your error
+        dispatch({type: ActionTypes.UPLOAD_VIDEO_ERROR, error});
     });
 }
