@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 const Pool = require('pg-pool');
 const fs = require('fs');
-const fileType = require('file-type');
+const FileType = require('file-type');
 const multiparty = require('multiparty');
 const bodyParser = require('body-parser');
 
@@ -33,7 +33,7 @@ app.post('/videos', (request, response) => {
         try {
             const path = files.file[0].path;
             const buffer = fs.readFileSync(path);
-            const type = fileType(buffer);
+            const type = await FileType.fromBuffer(buffer);
             const timestamp = Date.now().toString();
             const fileName = `${timestamp}-lg`;
             const data = await uploadService.uploadFile(buffer, fileName, type);
@@ -45,6 +45,7 @@ app.post('/videos', (request, response) => {
             // client.release();
             return response.status(200).send(data);
         } catch (awsUploadError) {
+            console.log(awsUploadError);
             return response.status(400).send(awsUploadError);
         }
     });
