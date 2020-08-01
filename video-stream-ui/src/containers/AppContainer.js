@@ -9,14 +9,20 @@ import {
     Media,
     Button
 } from 'react-bootstrap';
+import { Link, useParams } from "react-router-dom";
 import FileUpload from './FileUpload';
 import VideoThumbnail from '../components/VideoThumbnail';
+import ReactPlayer from 'react-player';
 
 const AppContainer = ({ videos }) => {
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const { id: videoId } = useParams("/watch/:id");
+    const currentVideo = videos.find(video => video.id === parseInt(videoId));
+    console.log(currentVideo);
 
     return (
         <Container fluid>
@@ -25,7 +31,7 @@ const AppContainer = ({ videos }) => {
                     <Modal.Title>Upload a video</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <FileUpload onCloseModal={handleClose}/>
+                    <FileUpload onCloseModal={handleClose} />
                 </Modal.Body>
             </Modal>
             <Row style={{ height: '100vh' }}>
@@ -36,10 +42,18 @@ const AppContainer = ({ videos }) => {
                     {videos.map(video => (
                         <Row>
                             <Media className="w-100">
-                                <VideoThumbnail
-                                    title={video.title}
-                                    imgSource={require("../shared/img/play-thumbnail.png")}
-                                />
+                                <Link
+                                    to={`/watch/${video.id}`}
+                                    style={{
+                                        textDecoration: 'none',
+                                        color: 'black'
+                                    }}
+                                >
+                                    <VideoThumbnail
+                                        title={video.title}
+                                        imgSource={require("../shared/img/play-thumbnail.png")}
+                                    />
+                                </Link>
                             </Media>
                         </Row>
                     ))}
@@ -48,8 +62,19 @@ const AppContainer = ({ videos }) => {
                     <Row style={{ display: 'flex', justifyContent: 'flex-end', margin: '1em' }}>
                         <Button onClick={handleShow}>Upload</Button>
                     </Row>
-                    <Row style={{ display: 'flex', justifyContent: 'center' }}>
-                        <h4 className="m-2">Current Video Title</h4>
+                    <Row style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        {currentVideo ? (
+                            <div>
+                                <ReactPlayer
+                                    url={currentVideo.url}
+                                    controls={true}
+                                />
+                                <h4 className="m-2">{currentVideo.title}</h4>
+                            </div>
+                        ) : (
+                                <h4 className="m-2">Select a video from the sidebar</h4>
+                            )
+                        }
                     </Row>
                 </Col>
             </Row>
