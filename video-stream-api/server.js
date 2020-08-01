@@ -54,21 +54,39 @@ app.post('/videos', (request, response) => {
                     videos: result.rows
                 });
             } catch (awsUploadError) {
-                console.log(awsUploadError);
-                return response.status(400).send(awsUploadError);
+                return response.status(500).send(awsUploadError);
             }
         }
     });
 });
 
 // Update a video
-// app.put('/videos/:id', async function (req, res) {
-//     const pool = new Pool(databaseConfig);
-//     const client = await pool.connect();
-//     const result = await client.query("select * from videos");
-//     client.release();
-//     res.send(result.rows);
-// });
+app.put('/videos/:id', async function (request, response) {
+    const form = new multiparty.Form();
+    form.parse(request, async (error, fields) => {
+        if (error) {
+            response.status(500).send(error);
+        } else if (!fields.password.includes(process.env.ADMIN_UPLOAD_PASSWORD)) {
+            response.status(403).send();
+        } else {
+            try {
+                const title = fields.title[0];
+                const pool = new Pool(databaseConfig);
+                const client = await pool.connect();
+                await client.query(
+                    `UPDATE videos SET "title" = '${title}' where "id" = ${request.params.id}`
+                );
+                const result = await client.query("SELECT * FROM videos");
+                client.release();
+                return response.status(200).send({
+                    videos: result.rows
+                });
+            } catch (dbUpdateError) {
+                return response.status(500).send(dbUpdateError);
+            }
+        }
+    });
+});
 
 
 app.listen(8081);

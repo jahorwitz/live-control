@@ -26,3 +26,19 @@ export const uploadNewVideo = (file, password) => async (dispatch) => {
         dispatch({type: ActionTypes.UPLOAD_VIDEO_ERROR, error});
     });
 }
+
+export const renameVideo = (id, newTitle, password) => async (dispatch) => {
+    dispatch({ type: ActionTypes.UPDATE_VIDEO_REQUEST });
+    const formData = new FormData();
+    formData.append('password', password);
+    formData.append('title', newTitle);
+    axios.put(`${process.env.REACT_APP_API_BASE_URL}/videos/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }).then(response => {
+        dispatch({type: ActionTypes.UPDATE_VIDEO_SUCCESS, videos: response.data.videos});
+    }).catch(error => {
+        dispatch({type: ActionTypes.UPDATE_VIDEO_ERROR, error});
+    });
+}

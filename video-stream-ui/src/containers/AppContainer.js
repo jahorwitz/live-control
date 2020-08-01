@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { Link, useParams } from "react-router-dom";
 import {
     Container,
     Modal,
@@ -9,44 +10,58 @@ import {
     Media,
     Button
 } from 'react-bootstrap';
-import { Link, useParams } from "react-router-dom";
+import { FaEdit } from 'react-icons/fa';
 import FileUpload from './FileUpload';
+import RenameVideo from './RenameVideo';
 import VideoThumbnail from '../components/VideoThumbnail';
 import ReactPlayer from 'react-player';
 
 const AppContainer = ({ videos }) => {
-    const [show, setShow] = useState(false);
+    const [showUpload, setShowUpload] = useState(false);
+    const [showRename, setShowRename] = useState(false);
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleCloseUpload = () => setShowUpload(false);
+    const handleShowUpload = () => setShowUpload(true);
+    const handleCloseRename = () => setShowRename(false);
+    const handleShowRename = () => setShowRename(true);
 
     const { id: videoId } = useParams("/watch/:id");
     const currentVideo = videos.find(video => video.id === parseInt(videoId));
-    console.log(currentVideo);
 
     return (
         <Container fluid>
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={showUpload} onHide={handleCloseUpload}>
                 <Modal.Header closeButton>
                     <Modal.Title>Upload a video</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <FileUpload onCloseModal={handleClose} />
+                    <FileUpload onCloseModal={handleCloseUpload} />
                 </Modal.Body>
             </Modal>
+            {currentVideo && (
+                <Modal show={showRename} onHide={handleCloseRename}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Update this video</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <RenameVideo id={currentVideo.id} onCloseModal={handleCloseRename} />
+                    </Modal.Body>
+                </Modal>
+            )}
             <Row style={{ height: '100vh' }}>
-                <Col xs={2} style={{ backgroundColor: 'gray' }}>
+                <Col xs={2} style={{ backgroundColor: 'gray', maxHeight: '100%', overflow: 'hidden', overflowY: 'scroll' }}>
                     <Row style={{ display: 'flex', justifyContent: 'center' }}>
                         <h4 className="m-2 text-center">Available Videos</h4>
                     </Row>
                     {videos.map(video => (
-                        <Row>
+                        <Row key={video.filename}>
                             <Media className="w-100">
                                 <Link
                                     to={`/watch/${video.id}`}
                                     style={{
                                         textDecoration: 'none',
-                                        color: 'black'
+                                        color: 'black',
+                                        maxWidth: '100%'
                                     }}
                                 >
                                     <VideoThumbnail
@@ -60,7 +75,7 @@ const AppContainer = ({ videos }) => {
                 </Col>
                 <Col>
                     <Row style={{ display: 'flex', justifyContent: 'flex-end', margin: '1em' }}>
-                        <Button onClick={handleShow}>Upload</Button>
+                        <Button onClick={handleShowUpload}>Upload</Button>
                     </Row>
                     <Row style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         {currentVideo ? (
@@ -69,7 +84,17 @@ const AppContainer = ({ videos }) => {
                                     url={currentVideo.url}
                                     controls={true}
                                 />
-                                <h4 className="m-2">{currentVideo.title}</h4>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}>
+                                    <FaEdit
+                                        size="1.5em"
+                                        onClick={handleShowRename}
+                                        style={{cursor: 'pointer'}}
+                                    />
+                                    <h4 className="m-2">{currentVideo.title}</h4>
+                                </div>
                             </div>
                         ) : (
                                 <h4 className="m-2">Select a video from the sidebar</h4>
