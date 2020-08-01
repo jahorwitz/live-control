@@ -10,6 +10,7 @@ import {
     Button
 } from 'react-bootstrap';
 import FileUpload from './FileUpload';
+import VideoThumbnail from '../components/VideoThumbnail';
 
 const AppContainer = ({ videos }) => {
     const [show, setShow] = useState(false);
@@ -30,17 +31,14 @@ const AppContainer = ({ videos }) => {
             <Row style={{ height: '100vh' }}>
                 <Col xs={2} style={{ backgroundColor: 'gray' }}>
                     <Row style={{ display: 'flex', justifyContent: 'center' }}>
-                        <h4 className="m-2">Available Videos</h4>
+                        <h4 className="m-2 text-center">Available Videos</h4>
                     </Row>
                     {videos.map(video => (
                         <Row>
-                            <Media>
-                                <img
-                                    width={64}
-                                    height={64}
-                                    className="m2-3"
-                                    src={video.url}
-                                    alt={video.title}
+                            <Media className="w-100">
+                                <VideoThumbnail
+                                    title={video.title}
+                                    imgSource={require("../shared/img/play-thumbnail.png")}
                                 />
                             </Media>
                         </Row>
