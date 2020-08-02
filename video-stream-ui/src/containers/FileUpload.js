@@ -7,7 +7,7 @@ import {
 } from 'react-bootstrap';
 import { uploadNewVideo } from '../actions/VideoActions';
 
-const FileUpload = ({ uploadNewVideo, onCloseModal }) => {
+const FileUpload = ({ uploadNewVideo, onSubmitUpload, onCloseModal }) => {
     const [file, setFile] = useState(null);
     const [password, setPassword] = useState(null);
     const [displayPasswordRequiredError, setDisplayPasswordRequiredError] = useState(false);
@@ -21,6 +21,7 @@ const FileUpload = ({ uploadNewVideo, onCloseModal }) => {
             setDisplayPasswordRequiredError(false);
             setDisplayFileRequiredError(false);
             onCloseModal();
+            onSubmitUpload();
         } else if (file) {
             setDisplayPasswordRequiredError(true);
         } else {
@@ -76,7 +77,8 @@ const FileUpload = ({ uploadNewVideo, onCloseModal }) => {
 }
 
 FileUpload.propTypes = {
-    onCloseModal: PropTypes.func.isRequired
+    onCloseModal: PropTypes.func.isRequired,
+    onSubmitUpload: PropTypes.func.isRequired
 }
 
 export default connect(

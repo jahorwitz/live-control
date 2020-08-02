@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import {
     Container,
     Modal,
+    Alert,
     Col,
     Row,
     Media,
@@ -19,6 +20,7 @@ import ReactPlayer from 'react-player';
 const AppContainer = ({ videos }) => {
     const [showUpload, setShowUpload] = useState(false);
     const [showRename, setShowRename] = useState(false);
+    const [showProgress, setShowProgress] = useState(false);
     const [currentResolution, setCurrentResolution] = useState('480p');
 
     const handleCloseUpload = () => setShowUpload(false);
@@ -40,7 +42,7 @@ const AppContainer = ({ videos }) => {
                     <Modal.Title>Upload a video</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <FileUpload onCloseModal={handleCloseUpload} />
+                    <FileUpload onSubmitUpload={() => setShowProgress(true)} onCloseModal={handleCloseUpload} />
                 </Modal.Body>
             </Modal>
             {currentVideo && (
@@ -109,6 +111,17 @@ const AppContainer = ({ videos }) => {
                             )
                         }
                     </Row>
+                    {showProgress && (
+                        <Row>
+                            <Alert variant="success" onClose={() => setShowProgress(false)} dismissible>
+                                <Alert.Heading>Success!</Alert.Heading>
+                                <p>
+                                    Your video is currently uploading. It will become available shortly, as soon as we have finished processing it.
+                                    It may take a little while longer for large videos.
+                                </p>
+                            </Alert>
+                        </Row>
+                    )}
                 </Col>
             </Row>
         </Container>
