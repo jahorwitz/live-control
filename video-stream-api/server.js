@@ -39,11 +39,10 @@ app.post('/videos', (request, response) => {
                 const timestamp = Date.now().toString();
                 const fileName = `${timestamp}`;
 
-                console.log("Calling resize service...");
                 const resizedStreams = await resizeService.resizeVideo(path, type);
                 const uploadPromises = [];
-                console.log("Finished resizing...");
 
+                // Upload converted videos to S3
                 resizedStreams.forEach(video => {
                     const buffer = fs.readFileSync(video.path);
                     const data = uploadService.uploadFile(buffer, `${fileName}-${video.resolution}`, type);
@@ -51,7 +50,6 @@ app.post('/videos', (request, response) => {
                 })
 
                 await Promise.all(uploadPromises);
-                console.log("Finished uploading...");
     
                 // Insert record into database
                 const pool = new Pool(databaseConfig);

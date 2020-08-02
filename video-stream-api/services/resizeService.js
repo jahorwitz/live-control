@@ -1,5 +1,3 @@
-const fs = require('fs');
-const getDimensions = require('get-video-dimensions');
 const ffmpeg = require('fluent-ffmpeg');
 
 const supportedSizes = [
@@ -22,7 +20,6 @@ const supportedSizes = [
 ]
 
 const resizeVideo = async (path, type) => {
-    console.log("Getting dimensions...");
     const metadata = await new Promise((resolve, reject) => {
         ffmpeg.ffprobe(path, (err, metadata) => {
             if (err) {
@@ -32,11 +29,7 @@ const resizeVideo = async (path, type) => {
         })
     });
     const height = metadata.streams.find(stream => stream.height).height;
-
-
-    console.log("Height is ", height);
     const sizesToGenerate = supportedSizes.filter(size => size.height < height);
-    console.log("Generating sizes: ", JSON.stringify(sizesToGenerate, 0, 2));
 
     const outputFilePromises = [];
     const outputFiles = [];
@@ -54,18 +47,13 @@ const resizeVideo = async (path, type) => {
         sizesToGenerate.forEach(outputSize => {
             const outputPath = `${path}-${outputSize.name}`;
             const promise = new Promise((resolve, reject) => {
-                console.log("Starting to generate resolution: ", outputSize.name);
                 ffmpeg()
                     .input(path)
                     .format(type.ext)
                     .videoCodec('libx264')
                     .size(`?x${outputSize.height}`)
                     .on('end', resolve)
-                    .on('progress', function (progress) {
-                        console.log('Processing: ' + progress.percent + '% done');
-                    })
-                    .on('error', console.log)
-                    // .outputOptions(['-vcodec h264', '-pix_fmt yuv444p'])
+                    .on('error', reject)
                     .output(outputPath)
                     .run();
             });
