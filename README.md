@@ -58,8 +58,12 @@ RDS_HOSTNAME=<DATABASE HOST NAME>
 
 * Error handling on the UI is extremely minimal at this time- it should be improved on in the future. There are minimal checks for errors and there is no validation done on file uploads. Likewise, minimal testing was done on different video formats (so far, only MP4s were tested) and it's unclear if the conversion process as it is now would work for other formats.
 
+* There needs to be some kind of ORM or something in place for the PUT endpoint at the very least, currently it is likely vulnerable to SQL injection when a user updates the title because of the way we are performing raw queries.
+
 * There is no automated testing for anything- automated testing might be particularly difficult on the conversion process since it uses ffmpeg.
 
 * Most of the logic in the API is contained in one file- when writing code for production I prefer to keep it more organized into controllers and services, however this was a little thrown-together.
 
 * Similarly, I would prefer to go through the UI code and extract more components that can be re-used across the app.
+
+* CSS in the UI is mostly done inline currently, I would prefer to extract it to styled components or something more scalable in a long term project.
