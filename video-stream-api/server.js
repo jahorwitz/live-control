@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 const { databaseConfig } = require('./config');
 const uploadService = require('./services/uploadService');
+const resizeService = require('./services/resizeService');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -34,26 +35,38 @@ app.post('/videos', (request, response) => {
         } else {
             try {
                 const path = files.file[0].path;
-                const buffer = fs.readFileSync(path);
-                const type = await FileType.fromBuffer(buffer);
+                const type = await FileType.fromBuffer(fs.readFileSync(path));
                 const timestamp = Date.now().toString();
-                const fileName = `${timestamp}-lg`;
-                const data = await uploadService.uploadFile(buffer, fileName, type);
+                const fileName = `${timestamp}`;
+
+                console.log("Calling resize service...");
+                const resizedStreams = await resizeService.resizeVideo(path, type);
+                const uploadPromises = [];
+                console.log("Finished resizing...");
+
+                resizedStreams.forEach(video => {
+                    const buffer = fs.readFileSync(video.path);
+                    const data = uploadService.uploadFile(buffer, `${fileName}-${video.resolution}`, type);
+                    uploadPromises.push(data);
+                })
+
+                await Promise.all(uploadPromises);
+                console.log("Finished uploading...");
     
                 // Insert record into database
                 const pool = new Pool(databaseConfig);
                 const client = await pool.connect();
                 await client.query(
-                    `INSERT INTO videos (title, filename, url, resolutions)\
-                        VALUES ('New Video ${fileName}', '${data.Key}', '${data.Location}', ARRAY[]::varchar[])`
+                    `INSERT INTO videos (title, filename, resolutions)\
+                        VALUES ('New Video ${fileName}', '${fileName}', ARRAY['${resizedStreams.map(stream => stream.resolution).join(`', '`)}'])`
                 );
                 const result = await client.query("SELECT * FROM videos");
                 client.release();
                 return response.status(200).send({
-                    ...data,
                     videos: result.rows
                 });
             } catch (awsUploadError) {
+                console.log(awsUploadError);
                 return response.status(500).send(awsUploadError);
             }
         }

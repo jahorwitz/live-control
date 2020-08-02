@@ -19,11 +19,16 @@ import ReactPlayer from 'react-player';
 const AppContainer = ({ videos }) => {
     const [showUpload, setShowUpload] = useState(false);
     const [showRename, setShowRename] = useState(false);
+    const [currentResolution, setCurrentResolution] = useState('480p');
 
     const handleCloseUpload = () => setShowUpload(false);
     const handleShowUpload = () => setShowUpload(true);
     const handleCloseRename = () => setShowRename(false);
     const handleShowRename = () => setShowRename(true);
+
+    const handleChangeResolution = (resolution) => {
+        setCurrentResolution(resolution);
+    }
 
     const { id: videoId } = useParams("/watch/:id");
     const currentVideo = videos.find(video => video.id === parseInt(videoId));
@@ -81,9 +86,12 @@ const AppContainer = ({ videos }) => {
                         {currentVideo ? (
                             <div>
                                 <ReactPlayer
-                                    url={currentVideo.url}
+                                    url={`${process.env.REACT_APP_S3_OBJECT_BASE_URL}/${currentVideo.filename}-${currentResolution}`}
                                     controls={true}
                                 />
+                                {currentVideo.resolutions.map(resolution => (
+                                    <Button className="m-1" onClick={() => handleChangeResolution(resolution)}>{resolution}</Button>
+                                ))}
                                 <div style={{
                                     display: 'flex',
                                     alignItems: 'center'
@@ -91,7 +99,7 @@ const AppContainer = ({ videos }) => {
                                     <FaEdit
                                         size="1.5em"
                                         onClick={handleShowRename}
-                                        style={{cursor: 'pointer'}}
+                                        style={{ cursor: 'pointer' }}
                                     />
                                     <h4 className="m-2">{currentVideo.title}</h4>
                                 </div>

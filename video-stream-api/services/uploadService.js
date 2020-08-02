@@ -19,7 +19,7 @@ const uploadFile = (buffer, name, type) => {
         Body: buffer,
         Bucket: process.env.S3_BUCKET,
         ContentType: type.mime,
-        Key: `${name}.${type.ext}`
+        Key: `${name}`
     };
     return s3.upload(params).promise();
 };
